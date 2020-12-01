@@ -1,35 +1,36 @@
 %% PPE HS 20 - Kriging
 % Yue Pan & Fandré Josianne
-% Kriging interpolation for filling the missing value in a DEM datatset
+% Kriging interpolation for the dense dataset.
 
 clear; close all; clc;
 
 %% Load data
 data_path = ['.' filesep 'test_data' filesep];
 
-load([data_path 'dtm_basedata_coarse_lossy.mat']);
+load([data_path 'Data_dense_HW3.mat']);
 load([data_path 'Field_values_init.mat']);
+load([data_path 'Original_image.mat']); % ground truth
 
 %% Preprocessing
-% DTM to list
-dtm = From_grid_to_list(dtm_basedata_coarse_lossy); % convert to [(m*n) x 3] matrix, each row is [x,y,z]
-dtm_data = [dtm(2,:);dtm(1,:);dtm(3,:)]; % re-arrange x,y value
+% list to grid field
+field_data = Data_dense_HW3;
+field = From_list_to_grid(field_data,Field_values_init);
 
-min_z = min(dtm(3,:)); max_z = max(dtm(3,:)); std_z = std(dtm(3,:));
+min_z = min(field_data(3,:)); max_z = max(field_data(3,:)); std_z = std(field_data(3,:));
 min_z_thre = min_z-0.5*std_z; max_z_thre=max_z+0.5*std_z; z_thre= [min_z_thre, max_z_thre];
 
 %% Kriging (with spherical, exponential and squ. exponential semivariogram model)
 % Calculate missing values via ordinary Kriging
 %used_model = 'spherical'; % select from 'exponential', 'squared exponential' and  'spherical'
 % spherical model
-[Field_values_sphe, Field_variances_sphe, scale] = kriging_ppe(dtm_data, Field_values_init, 'spherical');
+[Field_values_sphe, Field_variances_sphe, scale] = kriging_ppe(field_data, Field_values_init, 'spherical');
 % exponential model
-[Field_values_exp, Field_variances_exp, scale] = kriging_ppe(dtm_data, Field_values_init, 'exponential');
+[Field_values_exp, Field_variances_exp, scale] = kriging_ppe(field_data, Field_values_init, 'exponential');
 % squared exponential model
-[Field_values_expsq, Field_variances_expsq, scale] = kriging_ppe(dtm_data, Field_values_init, 'squared_exponential');
+[Field_values_expsq, Field_variances_expsq, scale] = kriging_ppe(field_data, Field_values_init, 'squared_exponential');
 
 %% Baseline methods (linear, cubic, nature, nearest interpolation)
-[Nearest_Neighbor, Linear_Interp, Natural_Neighbor, Cubic] = Make_comparative_interpolation(dtm_data, Field_values_init);
+[Nearest_Neighbor, Linear_Interp, Natural_Neighbor, Cubic] = Make_comparative_interpolation(field_data, Field_values_init);
 
 %% Plots
 figure(1);
@@ -37,7 +38,7 @@ clf;
 
 % Input image with missing parts
 subplot(3,4,1)
-imagesc(dtm_basedata_coarse_lossy, z_thre)
+imagesc(field, z_thre)
 colorbar
 axis equal
 xlim([1,40])
@@ -68,6 +69,14 @@ axis equal
 xlim([1,40])
 ylim([1,40])
 title('Kriging estimation (squ. exponential)','Fontname','Times New Roman','FontSize',14);
+
+subplot(3,4,5)
+imagesc(Original_image, z_thre)
+colorbar
+axis equal
+xlim([1,40])
+ylim([1,40])
+title('Underlying function (ground truth)','Fontname','Times New Roman','FontSize',14);
 
 % Kriging interpolation variance
 subplot(3,4,6)
@@ -131,5 +140,4 @@ axis equal
 xlim([1,40])
 ylim([1,40])
 title('Cubic Spline','Fontname','Times New Roman','FontSize',14);
-
 
