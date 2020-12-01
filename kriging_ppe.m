@@ -47,24 +47,25 @@ Gamma_mat = semivar_function(distMatC); % semivar matrix [n x n]
 C_mat = sigma_0^2 - Gamma_mat;          % covariance matrix [n x n]
 
 % Covariance and semi-variogram vectors (matrix) for new points
-gamma_vecs = semivar_function(distMatc)'; % semivar column vectors [m x n]
-c_vecs = sigma_0^2 - gamma_vecs;          % covariance column vectors [m x n] 
+gamma_vecs = semivar_function(distMatc)'; % semivar column vectors [n x m]
+c_vecs = sigma_0^2 - gamma_vecs;          % covariance column vectors [n x m] 
 
 one_vec =  ones(known_count, 1);   % [n x 1]
 Z_vec = Data(3,:)';                % [n x 1]
-inv_Gamma_mat = inv(Gamma_mat);    % [n x n]
+inv_Gamma_mat = pinv(Gamma_mat);   % [n x n], pinv use the Moore-Penrose pseudo inverse, which can ease the situation of ill-condition matrix
 
 %% Interpolation
 % Refer to the paper 'The origins of Kriging'
 % BLUP
-Z_s_vec = gamma_vecs'*inv_Gamma_mat*Z_vec + (1 - gamma_vecs'*inv_Gamma_mat*one_vec) * inv(one_vec'*inv_Gamma_mat*one_vec) * (one_vec'*inv_Gamma_mat*Z_vec); % BLUP [m x 1]
+Z_s_vec = gamma_vecs'*inv_Gamma_mat*Z_vec + (1 - gamma_vecs'*inv_Gamma_mat*one_vec) * pinv(one_vec'*inv_Gamma_mat*one_vec) * (one_vec'*inv_Gamma_mat*Z_vec); % BLUP [m x 1]
 
 % MSE of the prediction
-Z_s_var_vec = gamma_vecs'*inv_Gamma_mat*gamma_vecs - (1-gamma_vecs'*inv_Gamma_mat*one_vec).^2 * inv(one_vec'*inv_Gamma_mat*one_vec); % Variance [m x 1]
+Z_s_var_mat = gamma_vecs'*inv_Gamma_mat*gamma_vecs - (1-gamma_vecs'*inv_Gamma_mat*one_vec).^2 * pinv(one_vec'*inv_Gamma_mat*one_vec); % Variance [m x m]
+Z_s_var_vec = diag(Z_s_var_mat)'; % diagonal elements [1 x m]
 
 % add the x,y coordinates
-XYZ_s_vec = [Data_to_estimate;Z_s_vec']; % [3 x m]
-XYZ_s_var_vec = [Data_to_estimate;Z_s_var_vec']; % [3 x m]
+XYZ_s_vec = [Data_to_estimate; Z_s_vec']; % [3 x m]
+XYZ_s_var_vec = [Data_to_estimate; Z_s_var_vec]; % [3 x m]
 
 Field_values= Write_list_in_grid(Field_values, coord_to_index, XYZ_s_vec,3);   % output 1
 Field_variances= Write_list_in_grid(Field_values_init, coord_to_index, XYZ_s_var_vec,3); % output 2

@@ -7,3 +7,56 @@
 
 #### Supervisor: Dr. Jemil Avers Butt
 
+-----
+
+#### Goal: Implement the Kriging interpolation with various semivariogram models
+
+#### Environment and Prerequisites:  Matlab (2019 or higher) 
+
+------
+
+#### Implementation details: 
+
+TODO
+
+#### Codes architecture:
+
+TODO
+
+### Demo:
+
+#### DEM dataset:
+
+*Semi-variogram:*
+
+<img src="figures/semivariogram_dem_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+*Interpolation results:*
+
+<img src="figures/result_dem_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+#### Dense dataset:
+
+*Interpolation results:*
+
+<img src="figures/result_dense_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+*Interpolation error:*
+
+<img src="figures/diff_dense_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+#### Sparse dataset:
+
+<img src="figures/result_sparse_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+*Interpolation error:*
+
+<img src="figures/diff_sparse_dataset.jpg" alt="alt text" style="zoom:100%;">
+
+-----
+
+### Reference:
+
+[Cressie 1990 Kriging](https://link.springer.com/article/10.1007/BF00889887):
+
+Cressie, Noel. "The origins of kriging." *Mathematical geology* 22.3 (1990): 239-252.

@@ -42,7 +42,7 @@ end
 % the objective function to be minimized.
 
 % Initial value sill and range
-params(2)=max(exp_sem(2,:));                       % just take the maximum
+params(2)=max(exp_sem(2,:));           % just take the maximum
 params(1)=exp_sem(1,find(exp_sem(2,:)>=0.5*params(2),1,'first')); % take
                                   % lag, where first hit 0.5 the maximum
 
